@@ -1,0 +1,5 @@
+Pillow==2.4.0
+argparse==1.1
+-e git+https://github.com/soravux/gdata.git#egg=gdata
+requests==2.3.0
+-e hg+https://code.google.com/p/scoop/#egg=scoop
