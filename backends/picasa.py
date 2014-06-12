@@ -2,7 +2,7 @@ import os
 
 import gdata.photos, gdata.photos.service
 
-from common.download import downloadImage
+from .common.download import downloadImage
 
 
 def go(query, path):
@@ -11,7 +11,6 @@ def go(query, path):
     for photo in photos.entry:
         url = photo.media.content[0].url,
         url = url[0].decode('ascii')
-        #import pdb; pdb.set_trace()
         downloadImage(
             url,
             os.path.join(path, url.split("/")[-1]),
