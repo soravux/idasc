@@ -5,16 +5,13 @@ import sys
 from functools import partial
 
 import requests
+from progressbar import ProgressBar
+
+from .common.download import downloadImage
 
 
-# Parallel processing
-try:
-    from scoop import futures
-    parallel_map = futures.map
-except ImportError:
-    parallel_map = map
-
-
+# TODO: This API is deprecated and limited to 8 pages.
+# Use customsearch API instead
 BASE_URL = ("https://ajax.googleapis.com/ajax/services/search/images"
             "?v=1.0&q={query}&start={start}")
 
@@ -27,25 +24,20 @@ def performRequest(query, BASE_PATH, start):
     """
     r = requests.get(BASE_URL.format(query=query, start=start))
     response = json.loads(r.text)
-    print(BASE_URL.format(query=query, start=start), response)
     for image_info in response['responseData']['results']:
         url = image_info['unescapedUrl']
-        downloadImage(url, os.path.join(BASE_PATH, '%s') % url.split("/")[-1])
+        downloadImage(url, BASE_PATH)
 
 def go(query, path):
     """
     Download full size images from Google image search.
     """
-
-    BASE_PATH = os.path.join(path, query)
-
-    if not os.path.exists(BASE_PATH):
-        os.makedirs(BASE_PATH)
-
-    thisRequest = partial(performRequest, query, BASE_PATH)
+    thisRequest = partial(performRequest, query, path)
 
     # Maximum 8 pages as written in the JSON dev guide of Google Image
-    results = list(parallel_map(thisRequest, range(8)))
+    progress = ProgressBar()
+    for i in progress(range(8)):
+        thisRequest(i)
 
 if __name__ == '__main__':
     # Example use

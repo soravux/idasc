@@ -1,28 +1,45 @@
 from io import BytesIO
+import string
+import time
+import shutil
+import os
+import urllib
+from urllib import request
 
-import requests
-from requests.exceptions import ConnectionError
-from PIL import Image
+from .._config_parser import config
 
 
 def downloadImage(url, path):
     """
     Download image "url" in "path".
-
-    TODO: other than JPEG
-    TODO: if filename already exists?
+    Appends a _X before the extension if filename already exists
+    (and increments X).
+    Will try multiple times the download.
     """
-    try:
-        image_r = requests.get(url)
-    except ConnectionError as e:
-        print('Could not download %s' % url)
-        return
+    valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
+    output_filename = os.path.join(
+        path,
+        ''.join(c for c in url.split("/")[-1] if c in valid_chars),
+    )
+    original_output_filename = output_filename.rsplit(".", maxsplit=1)
+    counter = 1
+    while os.path.isfile(output_filename):
+        output_filename = "".join([
+            original_output_filename[0],
+            '_',
+            str(counter),
+            original_output_filename[1],
+        ])
+        counter += 1
 
-    # Remove file-system path characters from name.
-
-    with open(path, 'wb') as fhdl:
+    for _ in range(5):
         try:
-            Image.open(BytesIO(image_r.content)).save(fhdl, 'JPEG')
-        except IOError as e:
-            # Throw away some gifs...blegh.
-            print('Could not save {0}: {1}'.format(url, e))
+            filename, mime = request.urlretrieve(url)
+            shutil.move(filename, output_filename)
+        except urllib.error.HTTPError:
+            # Error while downloading file.
+            time.sleep(config.get('general', 'delay'))
+        else:
+            break
+    else:
+        print("Could not download url: ", url)

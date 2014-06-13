@@ -1,0 +1,14 @@
+[general]
+delay = 1
+
+[flickr]
+NB_IMAGES = 100
+API_KEY = your_API_key
+API_SECRET = your_API_secret
+email = your_email
+password = your_password
+AUTH = False
+debug = False
+
+[picasa]
+NB_IMAGES = 100

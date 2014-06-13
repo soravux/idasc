@@ -24,8 +24,8 @@ __author__ = "James Clarke <james@jamesclarke.info>"
 __version__ = "$Rev: 60 $"
 __date__ = "$Date: 2014-01-08 17:41:58 -0500 (mer 08 jan 2014) $"
 __copyright__ = "Copyright: 2004-2010 James Clarke; Portions: 2007-2008 Joshua Henderson; Portions: 2011 Andrei Vlad Vacariu"
-
-from urllib import urlencode, urlopen
+from urllib.parse import urlencode
+from urllib.request import urlopen
 from xml.dom import minidom
 import hashlib
 import os
@@ -34,12 +34,26 @@ HOST = 'http://flickr.com'
 API = '/services/rest'
 
 # set these here or using flickr.API_KEY in your application
-API_KEY = ''
-API_SECRET = ''
-email = None
-password = None
-AUTH = False
-debug = False
+import configparser
+config = configparser.SafeConfigParser()
+config.optionxform=str # Keep case
+config.read("config.ini")
+try:
+    for k, v in config['flickr'].items():
+        if v in ('True', 'False'):
+            v = (v == 'True')
+        globals()[k] = v
+except KeyError:
+    raise Exception("""
+        Could not initialize flickr backend, missing in config.ini.
+        These entries are required:
+            API_KEY = ''
+            API_SECRET = ''
+            email = None
+            password = None
+            AUTH = False
+            debug = False
+    """)
 
 # The next 2 variables are only importatnt if authentication is used
 
@@ -208,7 +222,7 @@ class Photo(object):
         try:
             tag_id = tag.id
         except AttributeError:
-            raise FlickrError, "Tag object expected"
+            raise FlickrError("Tag object expected")
         _dopost(method, auth=True, photo_id=self.id, tag_id=tag_id)
         self._load_properties()
 
@@ -269,7 +283,7 @@ class Photo(object):
         for psize in data.rsp.sizes.size:
             if psize.label == size:
                 return getattr(psize, urlType)
-        raise FlickrError, "No URL found"
+        raise FlickrError("No URL found")
 
     def getSizes(self):
         """
@@ -286,7 +300,7 @@ class Photo(object):
         props = {'url':str,'width':int,'height':int,'label':str,'source':str,'text':str}
         for psize in data.rsp.sizes.size:
             d = {}
-            for prop,convert_to_type in props.items():
+            for prop,convert_to_type in list(props.items()):
                 d[prop] = convert_to_type(getattr(psize, prop))
             ret.append(d)
         return ret
@@ -549,7 +563,7 @@ class Photoset(object):
         photo - primary photo
         """
         if not isinstance(photo, Photo):
-            raise TypeError, "Photo expected"
+            raise TypeError("Photo expected")
         
         method = 'flickr.photosets.create'
         data = _dopost(method, auth=True, title=title,\
@@ -621,9 +635,9 @@ class User(object):
             self.__icon_url = 'http://www.flickr.com/images/buddyicon.jpg'
         
         self.__username = person.username.text
-        self.__realname = getattr((getattr(person,  'realname',  u'')), 'text', u'')
-        self.__location = getattr((getattr(person,  'location',  u'')), 'text', u'')
-        self.__photos_count = getattr((getattr(getattr(person,  'photos',  None),  'count',  u'')), 'text', u'')
+        self.__realname = getattr((getattr(person,  'realname',  '')), 'text', '')
+        self.__location = getattr((getattr(person,  'location',  '')), 'text', '')
+        self.__photos_count = getattr((getattr(getattr(person,  'photos',  None),  'count',  '')), 'text', '')
         if self.__photos_count:
             self.__photos_firstdate = person.photos.firstdate.text
             self.__photos_firstdatetaken = person.photos.firstdatetaken.text
@@ -934,7 +948,7 @@ class Gallery(object):
         """
         method = 'flickr.galleries.getPhotos'
         
-        extras = ','.join('%s=%s' % (i, v) for i, v in dict(extras).items())
+        extras = ','.join('%s=%s' % (i, v) for i, v in list(dict(extras).items()))
     
         data = _doget(method, gallery_id=self.id, per_page=per_page, \
                       page=page, extras=extras)
@@ -975,7 +989,7 @@ def photos_search(user_id='', auth=False,  tags='', tag_mode='', text='',\
                   content_type=content_type, \
                   tag_mode=tag_mode, **kwargs)
     photos = []
-    if data.rsp.photos.__dict__.has_key('photo'):
+    if 'photo' in data.rsp.photos.__dict__:
         if isinstance(data.rsp.photos.photo, list):
             for photo in data.rsp.photos.photo:
                 photos.append(_parse_photo(photo))
@@ -1008,7 +1022,7 @@ def photos_get_recent(extras='', per_page='', page=''):
     method = 'flickr.photos.getRecent'
     data = _doget(method, extras=extras, per_page=per_page, page=page)
     photos = []
-    if data.rsp.photos.__dict__.has_key('photo'):
+    if 'photo' in data.rsp.photos.__dict__:
         if isinstance(data.rsp.photos.photo, list):
             for photo in data.rsp.photos.photo:
                 photos.append(_parse_photo(photo))
@@ -1222,7 +1236,7 @@ def _doget(method, auth=False, **params):
 
     #another useful debug print statement
     if debug:       
-        print "_doget", url
+        print("_doget", url)
     
     return _get_data(minidom.parse(urlopen(url)))
 
@@ -1240,14 +1254,14 @@ def _dopost(method, auth=False, **params):
 
     #another useful debug print statement
     if debug:
-        print "_dopost url", url
-        print "_dopost payload", payload
+        print("_dopost url", url)
+        print("_dopost payload", payload)
     
     return _get_data(minidom.parse(urlopen(url, payload)))
 
 def _prepare_params(params):
     """Convert lists to strings with ',' between items."""
-    for (key, value) in params.items():
+    for (key, value) in list(params.items()):
         if isinstance(value, list):
             params[key] = ','.join([item for item in value])
     return params
@@ -1258,21 +1272,21 @@ def _get_data(xml):
     data = unmarshal(xml)
     if not data.rsp.stat == 'ok':
         msg = "ERROR [%s]: %s" % (data.rsp.err.code, data.rsp.err.msg)
-        raise FlickrError, msg
+        raise FlickrError(msg)
     return data
 
 def _get_api_sig(params):
     """Generate API signature."""
     token = userToken()
     parameters = ['api_key', 'auth_token']
-    for item in params.items():
+    for item in list(params.items()):
         parameters.append(item[0])
     parameters.sort()
 
     api_string = [API_SECRET]
 
     for item in parameters:
-        for chocolate in params.items():
+        for chocolate in list(params.items()):
             if item == chocolate[0]:
                 api_string.append(item)
                 api_string.append(str(chocolate[1]))
@@ -1363,7 +1377,7 @@ class Bag: pass
 def unmarshal(element):
     rc = Bag()
     if isinstance(element, minidom.Element):
-        for key in element.attributes.keys():
+        for key in list(element.attributes.keys()):
             setattr(rc, key, element.attributes[key].value)
             
     childElements = [e for e in element.childNodes \
@@ -1372,7 +1386,7 @@ def unmarshal(element):
         for child in childElements:
             key = child.tagName
             if hasattr(rc, key):
-                if type(getattr(rc, key)) <> type([]):
+                if type(getattr(rc, key)) != type([]):
                     setattr(rc, key, [getattr(rc, key)])
                 setattr(rc, key, getattr(rc, key) + [unmarshal(child)])
             elif isinstance(child, minidom.Element) and \
@@ -1397,8 +1411,8 @@ def unmarshal(element):
 #unique items from a list from the cookbook
 def uniq(alist):    # Fastest without order preserving
     set = {}
-    map(set.__setitem__, alist, [])
-    return set.keys()
+    list(map(set.__setitem__, alist, []))
+    return list(set.keys())
 
 ## Only the "getList" module is complete.
 ## Work in Progress; Nearly Finished
@@ -1483,9 +1497,9 @@ def userToken():
     # it cannot be got again, so flickr.py saves it in a file
     # called token.txt (default) somewhere.
     if not tokenPath == '':
-        f = file(os.path.join(tokenPath,tokenFile),'r')
+        f = open(os.path.join(tokenPath, tokenFile), 'r')
     else:
-        f = file(tokenFile,'r')
+        f = open(tokenFile, 'r')
     token = f.read()
     f.close()
     return token
@@ -1501,4 +1515,4 @@ def getUserPhotosURL(userid):
     return userurl
 
 if __name__ == '__main__':
-    print test_echo()
+    print(test_echo())

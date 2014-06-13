@@ -16,7 +16,7 @@ __date__ = "$Date: 2007-03-22 15:28:46 -0400 (jeu 22 mar 2007) $"
 __copyright__ = "Copyright 2004 James Clarke"
 
 import sys
-import flickr
+from . import flickr
 
 def set_from_tags(tags, title, description, all=True):
     """all=True means include non-public photos"""
@@ -32,9 +32,9 @@ def main(*argv):
     try:
         (opts, args) = getopt(argv[1:], 'e:p:t:d:', \
                               ['email', 'password', 'title', 'description'])
-    except GetoptError, e:
-        print e
-        print __doc__
+    except GetoptError as e:
+        print(e)
+        print(__doc__)
         return 1
 
     title = None
@@ -50,31 +50,31 @@ def main(*argv):
         elif o in ('-d', '--description'):
             description = a
         else:
-            print "Unknown argument: %s" % o
-            print __doc__
+            print("Unknown argument: %s" % o)
+            print(__doc__)
             return 1
 
     if flickr.email is None:
-        print "email is required"
-        print __doc__
+        print("email is required")
+        print(__doc__)
         return 1
     if flickr.password is None:
-        print "password is required"
-        print __doc__
+        print("password is required")
+        print(__doc__)
         return 1
     if title is None:
-        print "title is required"
-        print __doc__
+        print("title is required")
+        print(__doc__)
         return 1
     if len(args) == 0:
-        print "You must specify at least one tag"
-        print __doc__
+        print("You must specify at least one tag")
+        print(__doc__)
         return 1
     
     tags = [item for item in args]
 
     set = set_from_tags(tags, title, description)
-    print "Photoset %s created with %s photos" % (set.title, len(set)) 
+    print("Photoset %s created with %s photos" % (set.title, len(set))) 
     
 if __name__ == '__main__':
     sys.exit(main(*sys.argv))

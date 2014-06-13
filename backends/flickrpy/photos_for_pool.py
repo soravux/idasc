@@ -18,8 +18,8 @@ __date__ = "$Date: 2007-03-22 15:28:46 -0400 (jeu 22 mar 2007) $"
 __copyright__ = "Copyright 2004-5 James Clarke"
 
 import sys
-import urllib
-import flickr
+import urllib.request, urllib.parse, urllib.error
+from . import flickr
 
 verbose = False
 
@@ -38,7 +38,7 @@ def getURL(photo, size, equal=False):
                 return psize.source
             elif not equal:
                 return psize.source
-    raise flickr.FlickrError, "No URL found"
+    raise flickr.FlickrError("No URL found")
 
 def getPhotoURLs(groupid, size, number, equal=False):
     group = flickr.Group(groupid)
@@ -49,7 +49,7 @@ def getPhotoURLs(groupid, size, number, equal=False):
             urls.append(getURL(photo, size, equal))
         except flickr.FlickrError:
             if verbose:
-                print "%s has no URL for %s" % (photo, size)
+                print("%s has no URL for %s" % (photo, size))
     return urls
     
 
@@ -60,9 +60,9 @@ def main(*argv):
         (opts, args) = getopt(argv[1:],\
                               'ves:n:',\
                               ['verbose', 'size', 'equal', 'number'])
-    except GetoptError, e:
-        print e
-        print __doc__
+    except GetoptError as e:
+        print(e)
+        print(__doc__)
         return 1
 
     size = 'Medium'
@@ -79,13 +79,13 @@ def main(*argv):
         elif o in ('-n', '--number'):
             number = a
         else:
-            print "Unknown argument: %s" % o
-            print __doc__
+            print("Unknown argument: %s" % o)
+            print(__doc__)
             return 1
         
     if len(args) == 0:
-        print "You must specify a group"
-        print __doc__
+        print("You must specify a group")
+        print(__doc__)
         return 1
     
     groupid = args[0]
@@ -93,7 +93,7 @@ def main(*argv):
     urls = getPhotoURLs(groupid, size, number, equal)
 
     for url in urls:
-        print url
+        print(url)
         
 if __name__ == '__main__':
     sys.exit(main(*sys.argv))

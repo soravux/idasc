@@ -7,9 +7,13 @@ multiple data sources such as google images, picasa, flickr, etc.
 Installation
 ------------
 
-    pip install imdasc
+    git clone https://github.com/soravux/idasc.git
+    cd idasc
+    cp config.ini.dist config.ini
+    nano config.ini
 
 Usage
 -----
 
-    imdasc.py [keyword] [output directory]
+    python imdasc.py [keyword]
+    python imdasc.py --help

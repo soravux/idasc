@@ -17,11 +17,11 @@ __date__ = "$Date: 2007-03-22 15:28:46 -0400 (jeu 22 mar 2007) $"
 __copyright__ = "Copyright 2004-5 James Clarke"
 
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import math
 import random
 import Image
-import flickr
+from . import flickr
 
 #this is slow as so many API calls
 def get_urls_for_tags(tags, number):
@@ -57,9 +57,9 @@ def create_wallpaper(screen, urls, size=(100, 100), randomise=False):
     height = int(math.ceil(float(screen[1]) / size[1]))
     
     offset = [0,0]
-    for i in xrange(height):
+    for i in range(height):
         y = size[1] * i
-        for j in xrange(width):
+        for j in range(width):
             x = size[0] * j
             photo = load_photo(urls.pop())
             if photo.size != size:
@@ -70,7 +70,7 @@ def create_wallpaper(screen, urls, size=(100, 100), randomise=False):
         
 
 def load_photo(url):
-    file, mime = urllib.urlretrieve(url)
+    file, mime = urllib.request.urlretrieve(url)
     photo = Image.open(file)
     return photo
 
@@ -79,9 +79,9 @@ def main(*argv):
 
     try:
         (opts, args) = getopt(argv[1:], 'w:h:f', ['width', 'height', 'file'])
-    except GetoptError, e:
-        print e
-        print __doc__
+    except GetoptError as e:
+        print(e)
+        print(__doc__)
         return 1
 
     width = 1024
@@ -96,13 +96,13 @@ def main(*argv):
         elif o in ('-f' '--file'):
             file = a
         else:
-            print "Unknown argument: %s" % o
-            print __doc__
+            print("Unknown argument: %s" % o)
+            print(__doc__)
             return 1
         
     if len(args) == 0:
-        print "You must specify at least one tag"
-        print __doc__
+        print("You must specify at least one tag")
+        print(__doc__)
         return 1
     
     tags = [item for item in args]

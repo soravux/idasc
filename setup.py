@@ -12,14 +12,8 @@ setup(
     author_email='yannickhold@gmail.com',
     url='',
     download_url='',
-    install_requires=[
-        'gdata>=2.0.18'
-        'Pillow>=2.4.0'
-        'requests>=2.3.0',
-    ],
-    py_modules=[
-        'imdown.py',
-    ],
+    install_requires=open('requirements.txt', 'r').readlines(),
+    py_modules=[],
     packages=[],
     platforms=['any'],
     keywords=[

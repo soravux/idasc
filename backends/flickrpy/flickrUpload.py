@@ -4,9 +4,9 @@ __date__ = "$Date: 2010-10-31 19:05:46 +0400 (Sun, 31 Oct 2010) $"
 __copyright__ = "Copyright 2010 Khosorw Ebrahimpour"
 
 
-import httplib
+import http.client
 import mimetypes
-import flickr
+from . import flickr
 from xml.dom import minidom
 
 		
@@ -49,7 +49,7 @@ def post_multipart(host, selector, fields, files):
     Return the server's response page.
     """
     content_type, body = encode_multipart_formdata(fields, files)
-    h = httplib.HTTP(host)
+    h = http.client.HTTP(host)
     h.putrequest('POST', selector)
     h.putheader('content-type', content_type)
     h.putheader('content-length', str(len(body)))
@@ -68,7 +68,7 @@ def encode_multipart_formdata(fields, files):
     BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
     CRLF = '\r\n'
     L = []
-    for (key, value) in fields.items():
+    for (key, value) in list(fields.items()):
         L.append('--' + BOUNDARY)
         L.append('Content-Disposition: form-data; name="%s"' % key)
         L.append('')
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 	# please use it as a guide only
 	photo = upload(filename='image.jpg', title='some photo', tags='tag1 tag2', description='A test photo')	
 
-	print "your photo is now at : %s" % photo.getURL()
+	print("your photo is now at : %s" % photo.getURL())
 
 	 
     
