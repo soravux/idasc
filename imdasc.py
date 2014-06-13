@@ -20,7 +20,7 @@ def main(keyword, path):
         if args.backends != 'all' and module_name not in args.backends:
             continue
         if not args.quiet:
-            print("Downloading from ", module_name)
+            print("Downloading from {module_name}".format(**locals()))
         module = getattr(backends, module_name)
         try:
             module.go(keyword, path)
