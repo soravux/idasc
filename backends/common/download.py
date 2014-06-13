@@ -28,6 +28,7 @@ def downloadImage(url, path):
             original_output_filename[0],
             '_',
             str(counter),
+            '.',
             original_output_filename[1],
         ])
         counter += 1
