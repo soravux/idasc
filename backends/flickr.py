@@ -22,5 +22,8 @@ def go(keyword, path):
         #loc = photo.getLocation()
         #if loc:
         #    print("Photo {} has a location: {}".format(photo.title, loc))
-        url = photo.getURL(size='Large', urlType='source')
+        try:
+            url = photo.getURL(size='Large', urlType='source')
+        except flickr.FlickrError:
+            pass
         downloadImage(url, path)
