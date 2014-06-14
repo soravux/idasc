@@ -39,7 +39,7 @@ def downloadImage(url, path):
             shutil.move(filename, output_filename)
         except urllib.error.HTTPError:
             # Error while downloading file.
-            time.sleep(config.get('general', 'delay'))
+            time.sleep(int(config.get('general', 'delay')))
         else:
             break
     else:

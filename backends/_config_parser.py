@@ -8,3 +8,9 @@ config = configparser.SafeConfigParser({
 })
 config.optionxform=str # Keep case
 config.read("config.ini")
+
+try:
+    delay = int(config.get('general', 'delay'))
+except:
+    raise Exception("Please insert a delay in the section 'general' of your "
+                    "config.ini")
