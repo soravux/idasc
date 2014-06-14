@@ -1,8 +1,5 @@
 import json
-import os
-import time
 import sys
-from functools import partial
 
 import requests
 from progressbar import ProgressBar
@@ -32,12 +29,10 @@ def go(query, path):
     """
     Download full size images from Google image search.
     """
-    thisRequest = partial(performRequest, query, path)
-
     # Maximum 8 pages as written in the JSON dev guide of Google Image
     progress = ProgressBar()
     for i in progress(range(8)):
-        thisRequest(i)
+        performRequest(query, path, i)
 
 if __name__ == '__main__':
     # Example use

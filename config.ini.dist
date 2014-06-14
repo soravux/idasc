@@ -12,3 +12,7 @@ debug = False
 
 [picasa]
 NB_IMAGES = 100
+
+[imgur]
+NB_IMAGES = 100
+API_KEY = your_API_key
