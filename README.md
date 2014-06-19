@@ -31,17 +31,9 @@ recommend using a virtual environment (which can be installed using
 Getting keys
 ------------
 
-Bing
-~~~~
-http://www.bing.com/dev/en-us/dev-center
-
-imgur
-~~~~~
-https://imgur.com/account/settings/apps
-
-flickr
-~~~~~~
-https://www.flickr.com/services/apps/create/
+* Bing: http://www.bing.com/dev/en-us/dev-center
+* imgur: https://imgur.com/account/settings/apps
+* flickr: https://www.flickr.com/services/apps/create/
 
 
 Usage
