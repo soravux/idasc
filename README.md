@@ -43,8 +43,7 @@ Usage
     python idasc.py --help
 
 
-Adding a backend
-~~~~~~~~~~~~~~~~
+### Adding a backend ###
 
 Just create a new python module in the `backends` directory containing a
 `go(keyword, path)` function. This function will receive the keyword entered
