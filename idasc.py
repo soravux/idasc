@@ -2,12 +2,14 @@ import sys
 import os
 import argparse
 import traceback
+from os.path import join
 
 import backends
+import similar
 
 
 def main(keyword, path):
-    path = os.path.join(path, keyword)
+    path = join(path, keyword)
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -16,6 +18,7 @@ def main(keyword, path):
               ''.format(**locals())
         )
 
+    # Download phase
     for module_name in backends.__all__:
         if args.backends != 'all' and module_name not in args.backends:
             continue
@@ -28,6 +31,10 @@ def main(keyword, path):
             print("Module {module_name} had exception:\n".format(**locals()))
             print(traceback.format_exc())
             print("Continuing with next backend...")
+
+    # Cleanup phase
+    if not args.no_cleanup:
+        similar.cleanupPhase(args, path)
 
 
 if __name__ == '__main__':
@@ -42,6 +49,9 @@ if __name__ == '__main__':
                         nargs='+',
                         default='all',
                         help="Backends to use")
+    parser.add_argument("--no_cleanup",
+                        help="Disables the cleanp phase",
+                        action="store_true")
     args = parser.parse_args()
 
     main(args.keyword, 'images')
