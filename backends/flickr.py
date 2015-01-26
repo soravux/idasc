@@ -12,11 +12,16 @@ NB_IMAGES = config.get('flickr', 'NB_IMAGES')
 
 def go(keyword, path):
     """Picasa fetcher"""
+    keyword = keyword.replace(' ', ',')
+    print(keyword)
     photos = flickr.photos_search(
+        content_type=1,
         tags=keyword,
-        #tag_mode='all',
+        tag_mode='all',
         per_page=NB_IMAGES,
+        page=1,
     )
+    print(len(photos))
     progress = ProgressBar()
     for photo in progress(photos):
         #loc = photo.getLocation()

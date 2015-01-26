@@ -40,6 +40,12 @@ def downloadImage(url, path):
         except urllib.error.HTTPError:
             # Error while downloading file.
             time.sleep(int(config.get('general', 'delay')))
+        except urllib.error.URLError:
+            print("Timeout Error")
+            break
+        except TimeoutError:
+            print("Timeout Error")
+            break 
         else:
             break
     else:
