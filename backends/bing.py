@@ -34,7 +34,10 @@ def go(query, path):
         # Parse the results and download the images
         for image_info in response['d']['results']:
             url = image_info['MediaUrl']
-            downloadImage(url, path)
+            try:
+                downloadImage(url, path)
+            except UnicodeEncodeError:
+                print("Due to UnicodeEncodeError, impossible to download : " + url + ". Skipping it!") 
             images_done += 1
             progress.update(images_done)
             if images_done >= NB_IMAGES:
