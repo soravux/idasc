@@ -34,6 +34,7 @@ Getting keys
 * Bing: http://www.bing.com/dev/en-us/dev-center
 * imgur: https://imgur.com/account/settings/apps
 * flickr: https://www.flickr.com/services/apps/create/
+* Google: https://console.developers.google.com/ (key) and https://www.google.com/cse/ (cx)
 
 
 Usage
