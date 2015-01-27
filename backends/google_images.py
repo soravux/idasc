@@ -22,6 +22,7 @@ def performRequest(query, BASE_PATH, start):
     API reference:
     http://developers.google.com/apis-explorer/
     """
+    global img_done
     r = requests.get(BASE_URL.format(query=query, cx=cx, API_KEY=API_KEY, start=start))
     response = json.loads(r.text)
     for image_info in response['items']:
@@ -40,8 +41,7 @@ def go(query, path):
     progress = ProgressBar(maxval=NB_IMAGES).start()
     img_done = 0
     while img_done < NB_IMAGES:
-        img_done += performRequest(query, path, img_done + 1)
-        progress.update(img_done)
+        performRequest(query, path, img_done + 1)
     progress.finish()
 
 
