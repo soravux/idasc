@@ -34,7 +34,10 @@ def findAndDeleteSimilars(im1, im2, path):
     if error < 20:
         if not args.quiet:
             print("Deleting file {im2}, duplicate of {im1}".format(**locals()))
-        os.remove(join(path, im2))
+        try:
+            os.remove(join(path, im2))
+        except FileNotFoundError:
+            pass
 
 
 def updatePB(val):
@@ -78,3 +81,4 @@ def cleanupPhase(rcvargs, path):
     
     for task in tasks:
         task.get()
+    progress.finish()
