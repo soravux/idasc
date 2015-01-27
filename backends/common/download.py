@@ -4,6 +4,7 @@ import time
 import shutil
 import os
 import urllib
+import socket
 from urllib import request
 
 from .._config_parser import config
@@ -16,6 +17,9 @@ def downloadImage(url, path):
     (and increments X).
     Will try multiple times the download.
     """
+    timeout = int(config.get('general', 'timeout'))
+    socket.setdefaulttimeout(timeout)
+
     valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
     output_filename = os.path.join(
         path,
@@ -40,12 +44,9 @@ def downloadImage(url, path):
         except urllib.error.HTTPError:
             # Error while downloading file.
             time.sleep(int(config.get('general', 'delay')))
-        except urllib.error.URLError:
+        except (urllib.error.URLError, TimeoutError, socket.timeout):
             print("Timeout Error")
             break
-        except TimeoutError:
-            print("Timeout Error")
-            break 
         else:
             break
     else:
