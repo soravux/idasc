@@ -28,7 +28,11 @@ def go(query, path):
             BASE_URL.format(query=query, page=page),
             headers={"Authorization": "Client-ID {API_KEY}".format(API_KEY=API_KEY)},
         )
+
         response = json.loads(r.text)
+
+        if 'error' in response['data'].keys():
+            raise ValueError(response['data']['error'])
 
         # Parse the results and download the images
         for image_info in response['data']:

@@ -25,6 +25,10 @@ def performRequest(query, BASE_PATH, start):
     global img_done
     r = requests.get(BASE_URL.format(query=query, cx=cx, API_KEY=API_KEY, start=start))
     response = json.loads(r.text)
+
+    if not 'items' in response.keys():
+        raise ValueError('Could not find field "items" in:\n{}'.format(response))
+
     for image_info in response['items']:
         url = image_info['link']
         downloadImage(url, BASE_PATH)
