@@ -1,5 +1,11 @@
 [general]
 delay = 1
+timeout = 30
+
+[google]
+NB_IMAGES = 100
+API_KEY = your_API_key
+cx = your_cx
 
 [flickr]
 NB_IMAGES = 100
@@ -20,3 +26,8 @@ API_KEY = your_API_key
 [bing]
 NB_IMAGES = 100
 ACCOUNT_KEY = your_account_key
+
+[pixabay]
+NB_IMAGES = 500
+USERNAME = your_username
+API_KEY = your_API_key
