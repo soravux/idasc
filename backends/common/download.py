@@ -6,6 +6,8 @@ import os
 import urllib
 import socket
 from urllib import request
+import unicodedata
+
 
 from .._config_parser import config
 
@@ -37,6 +39,8 @@ def downloadImage(url, path):
         ])
         counter += 1
 
+    output_filename = unicodedata.normalize('NFKD', output_filename).encode('ascii','ignore')
+
     for _ in range(5):
         try:
             filename, mime = request.urlretrieve(url)
@@ -47,6 +51,8 @@ def downloadImage(url, path):
         except (urllib.error.URLError, TimeoutError, socket.timeout):
             print("Timeout Error")
             break
+        except Exception as e:
+            print("{}".format(e))
         else:
             break
     else:
